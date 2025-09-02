@@ -1,0 +1,3 @@
+[submodule "stm32ai-modelzoo-services"]
+	path = stm32ai-modelzoo-services
+	url = git@github.com:AngelNau/stm32ai-modelzoo-services.git
