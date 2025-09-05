@@ -73,7 +73,8 @@ def train_and_get_best_model(model, train_ds, val_ds, epochs=30, learning_rate=0
     print(f"Best validation accuracy: {best_val_acc:.4f}")
     return model, history
 
-data_dir = "<dataset_dir>"
+data_dir = "../flower_photos/"
+model_name = "mobileNetV2"
 seed = 42
 
 train_ds = keras.utils.image_dataset_from_directory(
@@ -95,7 +96,7 @@ val_ds = keras.utils.image_dataset_from_directory(
 )
 
 model = create_mobilenet_for_quantization()
-best_model, history = train_and_get_best_model(model, train_ds, val_ds, epochs=30)
+best_model, history = train_and_get_best_model(model, train_ds, val_ds, epochs=1)
 
 # Apply quantization aware training
 # q_aware_model = tfmot.quantization.keras.quantize_model(best_model)
@@ -115,7 +116,7 @@ converter.inference_input_type = tf.uint8
 quantized_tflite_model = converter.convert()
 # Save the model
 import pathlib
-path = pathlib.Path("./quantized_mobilenet.tflite")
+path = pathlib.Path(f"./quantized_{model_name}.tflite")
 path.write_bytes(quantized_tflite_model) # type: ignore
 
 print("Model successfully quantized and exported to TFLite!")

@@ -21,7 +21,8 @@ class WrappedModel(nn.Module):
         return out
 
 
-data_dir = "<>"
+data_dir = "../flower_photos/"
+model_name = "mobileNetV2"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 data_transforms = transforms.Compose([
@@ -58,13 +59,12 @@ model.load_state_dict(best_state)
 model = nn.Sequential(model, nn.Softmax(dim=1))
 model.cpu()
 model.eval()
-torch.save(model.state_dict(), "mobileNet.pth")
 # input_tensor = torch.randn(1, 3, 128, 128)
 input_tensor = torch.randint(0, 256, (1, 3, 128, 128), dtype=torch.uint8)
 torch.onnx.export(
     model,
     (input_tensor,),
-    "mobilenetv2_035_10.onnx",
+    f"{model_name}.onnx",
     input_names=["input"],
     output_names=["output"],
     dynamo=False,

@@ -29,7 +29,8 @@ class TinyCNN(nn.Module):
         x = self.fc1(x)
         return x
 
-data_dir = "<>"
+data_dir = "../flower_photos/"
+model_name = "tinyCnn"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 transform = transforms.Compose([
@@ -56,13 +57,14 @@ scheduler = optim.lr_scheduler.ReduceLROnPlateau(
 history, best_state, (test_loss, test_acc) = t.train_validate_test(model, train_loader, val_loader, criterion, optimizer, device, test_loader=test_loader, num_epochs=1, scheduler=scheduler, early_stop_patience=5, min_delta=1e-4)
 model.load_state_dict(best_state)
 model = nn.Sequential(model, nn.Softmax(dim=1))
-torch.save(model.state_dict(), "tinyCnn_10.pth")
+model.cpu()
+model.eval()
 # input_tensor = torch.randn(1, 3, 128, 128)
 input_tensor = torch.randint(0, 256, (1, 3, 128, 128), dtype=torch.uint8)
 torch.onnx.export(
     model,
     (input_tensor,),
-    "tinyCnn_10.onnx",
+    f"{model_name}.onnx",
     input_names=["input"],
     output_names=["output"],
     dynamo=False,
