@@ -98,25 +98,26 @@ val_ds = keras.utils.image_dataset_from_directory(
 model = create_mobilenet_for_quantization()
 best_model, history = train_and_get_best_model(model, train_ds, val_ds, epochs=1)
 
-# Apply quantization aware training
-# q_aware_model = tfmot.quantization.keras.quantize_model(best_model)
-# q_aware_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+floatConverter = tf.lite.TFLiteConverter.from_keras_model(best_model)
+floatConverter.inference_input_type = tf.uint8
 
-# Convert to TFLite
-converter = tf.lite.TFLiteConverter.from_keras_model(best_model)
-converter.optimizations = [tf.lite.Optimize.DEFAULT] # type: ignore
-converter.representative_dataset = representative_data_gen # type: ignore
-converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
-converter.inference_input_type = tf.uint8
+quantConverter = tf.lite.TFLiteConverter.from_keras_model(best_model)
+quantConverter.optimizations = [tf.lite.Optimize.DEFAULT] # type: ignore
+quantConverter.representative_dataset = representative_data_gen # type: ignore
+quantConverter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+quantConverter.inference_input_type = tf.uint8
 # converter.inference_output_type = tf.uint8
 
 # input_signature = [tf.TensorSpec([1, 128, 128, 3], tf.uint8, name='input')] # type: ignore
 # onnx_model, _ = tf2onnx.convert.from_keras(model, input_signature, opset=11)
 # onnx.save(onnx_model, "dst/path/model.onnx")
-quantized_tflite_model = converter.convert()
+quant_tflite_model = quantConverter.convert()
+float_tflite_model = floatConverter.convert()
 # Save the model
 import pathlib
+path = pathlib.Path(f"./float_{model_name}.tflite")
+path.write_bytes(float_tflite_model) # type: ignore
 path = pathlib.Path(f"./quantized_{model_name}.tflite")
-path.write_bytes(quantized_tflite_model) # type: ignore
+path.write_bytes(quant_tflite_model) # type: ignore
 
 print("Model successfully quantized and exported to TFLite!")

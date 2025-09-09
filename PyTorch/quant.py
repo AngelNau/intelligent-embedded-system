@@ -1,10 +1,11 @@
+from sys import argv
 import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
 from onnxruntime.quantization import CalibrationDataReader, quantize_static, QuantType, CalibrationMethod, QuantFormat
 
-model_name = "tinyCnn"
+model_name = argv[1]
 input_name = "input"
 input_size = 128
 batch_size = 128
