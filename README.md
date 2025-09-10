@@ -74,6 +74,12 @@ Once the virtual environment has been created, activated, and all the dependenci
 python <filename.py>
 ```
 
+### 4. Disabling the environment
+Once finished with running the Python scripts, you should disable the Python virtual environment. To do this run the following command:
+```bash
+deactivate
+```
+
 ## Additional documentation
 Inside each directory, there is an additional README.md file explaining the project further, please refer to them once the you've setup the virtual environments.\
 [PyTorch README.md](PyTorch/README.md)\
